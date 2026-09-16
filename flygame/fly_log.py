@@ -1,4 +1,4 @@
-"""right-side log of what this fly's own cells are doing"""
+"""right-side log: why this fly did what it did. the twitter money shot."""
 from __future__ import annotations
 
 import pygame
@@ -13,8 +13,8 @@ class FlyLog:
         self.lc4 = 0.0
         self.lplc2 = 0.0
         self.dnp01 = False
-        self.state = "—"
-        self.why = "quiet · no loom in RF"
+        self.state = "-"
+        self.why = "quiet  ·  no loom in RF"
         self.eta = 0.0
 
     def note(self, text: str, col=(220, 220, 210)):
@@ -30,31 +30,35 @@ class FlyLog:
         self.state = state
         cover = float(feat.get("cover", 0.0))
         if state == "dash":
-            self.why = "DNp01 burst · takeoff away from loom"
+            self.why = "DNp01 burst  ·  takeoff away from loom"
         elif state == "freeze" and armed:
-            self.why = "giant fiber armed · jump imminent"
+            self.why = "giant fiber armed  ·  jump imminent"
         elif state == "freeze":
-            self.why = "LC4/LPLC2 loom · freeze, waiting DNp01"
+            self.why = "LC4/LPLC2 loom  ·  freeze, waiting DNp01"
         elif cover < 0.08:
-            self.why = "shadow outside RF · ignore"
+            self.why = "shadow outside RF  ·  ignore"
         elif i4 + il < 0.04:
-            self.why = "dθ/dt below LC4 knee · quiet"
+            self.why = "dtheta below LC4 knee  ·  quiet"
         elif i4 >= il:
-            self.why = f"LC4  η={self.eta:.2f}  angular vel"
+            self.why = f"LC4  eta={self.eta:.2f}  angular vel"
         else:
-            self.why = f"LPLC2  θ={feat['theta']:.2f}  size"
+            self.why = f"LPLC2  theta={feat['theta']:.2f}  size"
 
     def draw(self, surf: pygame.Surface, font, font_sm, t_fn):
         pad = int(14 * C.SCALE)
-        box_w = min(460, int(C.W * 0.30))
+        box_w = min(480, int(C.W * 0.32))
         x = C.W - box_w - pad
         y = pad
-        h = int(320 * C.SCALE)
+        h = int(340 * C.SCALE)
         box = pygame.Surface((box_w, h), pygame.SRCALPHA)
-        box.fill((8, 14, 28, 210))
+        box.fill((8, 14, 28, 220))
+        pygame.draw.rect(box, (255, 230, 160, 40), box.get_rect(), 1)
         surf.blit(box, (x, y))
-        title = t_fn(font, f"fly {self.focus + 1}  ·  {self.state}", (255, 230, 160))
-        surf.blit(title, (x + 12, y + 8))
+
+        surf.blit(t_fn(font_sm, "what this fly sees", (180, 190, 210)), (x + 12, y + 8))
+        surf.blit(t_fn(font, f"fly {self.focus + 1}  {self.state}", (255, 230, 160)), (x + 12, y + 28))
+        pipe = t_fn(font_sm, "shadow -> LC4 + LPLC2 -> DNp01", (140, 160, 190))
+        surf.blit(pipe, (x + 12, y + 58))
 
         def bar(label, v, yy, col):
             surf.blit(t_fn(font_sm, label, (180, 190, 210)), (x + 12, yy))
@@ -64,18 +68,18 @@ class FlyLog:
             if fw > 0:
                 pygame.draw.rect(surf, col, (x + 12, yy + 20, fw, 11))
 
-        bar("LC4  dθ/dt", self.lc4, y + 44, (120, 200, 255))
-        bar("LPLC2  size", self.lplc2, y + 84, (255, 180, 90))
+        bar("LC4   angular vel  dA/dt", self.lc4, y + 80, (120, 200, 255))
+        bar("LPLC2 angular size", self.lplc2, y + 122, (255, 180, 90))
         dcol = (255, 90, 70) if self.dnp01 else (80, 90, 110)
-        surf.blit(t_fn(font_sm, "DNp01  giant fiber", dcol), (x + 12, y + 124))
+        surf.blit(t_fn(font_sm, "DNp01  giant fiber", dcol), (x + 12, y + 164))
         surf.blit(
-            t_fn(font_sm, "BURST" if self.dnp01 else "silent", dcol),
-            (x + 12, y + 144),
+            t_fn(font, "BURST" if self.dnp01 else "silent", dcol),
+            (x + 12, y + 184),
         )
         why = t_fn(font_sm, self.why, (210, 220, 200))
-        surf.blit(why, (x + 12, y + 168))
+        surf.blit(why, (x + 12, y + 218))
 
-        yy = y + 196
-        for line, col in self.lines[-5:]:
+        yy = y + 244
+        for line, col in self.lines[-4:]:
             surf.blit(t_fn(font_sm, line, col), (x + 12, yy))
             yy += int(20 * C.SCALE)

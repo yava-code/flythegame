@@ -66,6 +66,7 @@ SFX_VOL = 0.40
 
 UI_FONT_SIZE = 32
 UI_FONT_SM = 20
+UI_FONT_LG = 48
 BG = (28, 48, 92)
 SKIN = (238, 194, 166)
 SKIN_SHADE = (214, 164, 137)
@@ -118,5 +119,6 @@ def apply_display(w: int, h: int):
     g["FLY_SIZE"] = max(44, int(62 * s))
     g["HAND_SCALE_LOW"] = 1.05 * s
     g["HAND_SCALE_HIGH"] = 1.45 * s
-    g["UI_FONT_SIZE"] = max(30, int(34 * s))
-    g["UI_FONT_SM"] = max(18, int(20 * s))
+    g["UI_FONT_SIZE"] = max(28, int(32 * s))
+    g["UI_FONT_SM"] = max(16, int(18 * s))
+    g["UI_FONT_LG"] = max(40, int(46 * s))

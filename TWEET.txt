@@ -1,0 +1,12 @@
+I put the MaleCNS fruit-fly connectome (~166k neurons, frozen weights) in a fly swatter.
+
+The fly never sees your hand. It sees the shadow on the table.
+η = dA/dt / A → LC4 + LPLC2 → DNp01 giant fiber → takeoff in ~50–150 ms.
+
+Yellow freeze = the hit window. Slap then. Wait and it's gone.
+T toggles real wiring vs a degree-preserving shuffle.
+
+Weights were never trained to play this.
+
+MaleCNS v1.0 · CC BY 4.0 · Berg et al. 2026, Cell
+https://male-cns.janelia.org/

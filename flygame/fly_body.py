@@ -375,12 +375,16 @@ class FlyBody:
             surf.blit(img, img.get_rect(center=(cx, cy)))
             if self.alive:
                 self._wings(surf, cx, cy, face)
+        self._cx, self._cy = cx, cy
 
+    def draw_tell(self, surf: pygame.Surface):
+        s = C.SCALE
+        cx, cy = getattr(self, "_cx", int(self.x)), getattr(self, "_cy", int(self.y))
         if self.state == "freeze":
             pulse = 0.55 + 0.45 * abs(math.sin(self.anim * 6))
-            r = max(6, int(22 * s * (0.8 + 0.2 * pulse)))
+            r = max(10, int(34 * s * (0.85 + 0.15 * pulse)))
             ring = pygame.Surface((r * 2 + 4, r * 2 + 4), pygame.SRCALPHA)
-            pygame.draw.circle(ring, (255, 220, 80, int(120 * pulse)), (r + 2, r + 2), r, max(2, int(2 * s)))
+            pygame.draw.circle(ring, (255, 220, 80, int(160 * pulse)), (r + 2, r + 2), r, max(3, int(3 * s)))
             surf.blit(ring, ring.get_rect(center=(cx, cy)))
             bw = max(2, int(3 * s))
             pygame.draw.rect(surf, (255, 230, 90), (cx + int(14 * s), cy - int(20 * s), bw, int(12 * s)))

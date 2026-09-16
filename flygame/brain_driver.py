@@ -373,3 +373,12 @@ class BrainDriver:
             extra = "" if self.batch >= self.n else " · 1 brain, time-shared"
             return f"{tag} · MaleCNS v1.0{extra}"
         return f"loom fallback · {self.error or 'no flybrain'}"
+
+    def badge(self) -> tuple[str, tuple]:
+        if self.loading or not self.ready:
+            return "LOADING MaleCNS", (255, 200, 120)
+        if not self.ok:
+            return "LOOM FALLBACK", (200, 180, 140)
+        if self.mode == "real":
+            return "REAL WIRING", (120, 220, 140)
+        return "SHUFFLED", (255, 110, 90)

@@ -119,12 +119,7 @@ class ArmRope:
         for i in range(n):
             lx, ly = left[i]
             rx, ry = right[i]
-            shade.append((lx * 0.22 + rx * 0.78, ly * 0.22 + ry * 0.78))
+            shade.append((lx * 0.28 + rx * 0.72, ly * 0.28 + ry * 0.72))
         pygame.draw.polygon(surf, C.SKIN_SHADE, shade + right[::-1])
-        pygame.draw.lines(surf, C.INK, False, left, max(2, int(3 * C.SCALE)))
-        pygame.draw.lines(surf, C.INK, False, right, max(2, int(2 * C.SCALE)))
-        # stretch creases
-        step = max(2, self.n // 5)
-        for i in range(step, self.n - 1, step):
-            pygame.draw.line(surf, C.SKIN_SHADE, left[i], right[i], max(2, int(2 * C.SCALE)))
-        pygame.draw.circle(surf, C.SKIN, (int(self.pos[0][0]), int(self.pos[0][1])), int(self.hw0))
+        # cover the wrist seam under the sprite, no outline (outline reads as a hose)
+        pygame.draw.circle(surf, C.SKIN, (int(self.pos[0][0]), int(self.pos[0][1])), int(self.hw0 * 0.92))
