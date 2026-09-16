@@ -234,7 +234,7 @@ class BrainDriver:
                 self.brain.indices[:] = np.random.permutation(self._wiring_real)
             self.brain.reset()
             self._ring[:] = 0
-        print(f"[brain] mode → {mode}")
+        print(f"[brain] mode -> {mode}")
 
     # ---- encoding -------------------------------------------------------
 

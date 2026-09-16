@@ -11,3 +11,8 @@ assets/_debug*.png
 assets/raw/
 crash.log
 .freebuff/
+.agents/
+.cursor/
+skills-lock.json
+web/node_modules/
+web/.next/

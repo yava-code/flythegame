@@ -39,6 +39,19 @@ def _open_screen(fullscreen: bool) -> tuple[pygame.Surface, bool]:
     return pygame.display.set_mode((max(1280, int(w * 0.90)), max(720, int(h * 0.90)))), False
 
 
+def _pin_topmost():
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        hwnd = pygame.display.get_wm_info().get("window")
+        if not hwnd:
+            return
+        ctypes.windll.user32.SetWindowPos(hwnd, -1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0040)
+    except Exception:
+        pass
+
+
 class Game:
     def __init__(self, fullscreen: bool = True, headless: bool = False):
         C.dpi_aware()
@@ -70,6 +83,16 @@ class Game:
         self.best_escape = None
         self.intro = 0.0 if headless else 3.2
         self.coach_t = 0.0
+        self.demo = "--demo" in sys.argv
+        self.demo_t = 0.0
+        self.demo_t0 = None
+        self.demo_mx = C.W * 0.5
+        self.demo_my = C.H * 0.6
+        self.demo_did = set()
+        if self.demo:
+            self.intro = 2.8
+            pygame.mouse.set_visible(False)
+            _pin_topmost()
         self.reset_match()
 
     def _make_fonts(self):
@@ -169,6 +192,9 @@ class Game:
                 self.coach_t = 0.0
 
         mx, my = pygame.mouse.get_pos()
+        if self.demo:
+            self._demo_step(dt)
+            mx, my = self.demo_mx, self.demo_my
         self.hand.aim(mx, my, dt)
         was_swat = self.hand.state == "swat"
         landed = False
@@ -263,6 +289,52 @@ class Game:
         if self.intro <= 0:
             self.time_left = max(0.0, self.time_left - dt)
             self.coach_t += dt
+
+    def _demo_step(self, dt: float):
+        # wall clock so numba hitches don't skip the canned beats
+        if not self.brain.ready:
+            self.hand.z = 0.72
+            return
+        if self.demo_t0 is None:
+            # a few seconds so the recorder can attach after [brain] ready
+            self.demo_t0 = pygame.time.get_ticks() + 4000
+            print("[demo] brain ready, sequence in 4s")
+        self.demo_t = (pygame.time.get_ticks() - self.demo_t0) / 1000.0
+        t = self.demo_t
+        if t < 0:
+            self.hand.z = 0.72
+            return
+        live = [f for f in self.flies if f.alive]
+        tgt = None
+        if live:
+            tgt = min(live, key=lambda f: math.hypot(f.x - self.hand.x, f.y - self.hand.y))
+            self.demo_mx = tgt.x + 10
+            self.demo_my = tgt.y + 18
+        if t > 2.7 and self.intro > 0:
+            self.intro = 0.0
+            self.coach_t = 0.0
+        if self.hand.state == "idle":
+            if t < 5.4:
+                self.hand.z = 0.84
+            elif t < 7.6:
+                self.hand.z = max(0.22, 0.84 - (t - 5.4) * 0.28)
+        if t >= 7.7 and "swat1" not in self.demo_did and self.hand.state == "idle":
+            self.demo_did.add("swat1")
+            self.hand.start_swat()
+        if t >= 11.3 and "hide" not in self.demo_did:
+            self.demo_did.add("hide")
+            self.hand.hide_sprite = True
+        if t >= 14.2 and "shuffle" not in self.demo_did:
+            self.demo_did.add("shuffle")
+            self.hand.hide_sprite = False
+            self.toggle_mode()
+        if t >= 16.6 and "swat2" not in self.demo_did and self.hand.state == "idle":
+            self.demo_did.add("swat2")
+            self.hand.start_swat()
+        if t > 80:
+            self.brain.stop()
+            pygame.quit()
+            sys.exit(0)
 
     def draw_ui(self):
         s = C.SCALE
@@ -480,7 +552,7 @@ class Game:
 
 
 def main():
-    fs = "--windowed" not in sys.argv
+    fs = "--windowed" not in sys.argv and "--demo" not in sys.argv
     if "--fullscreen" in sys.argv:
         fs = True
     try:
