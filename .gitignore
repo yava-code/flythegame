@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
+dist/
+build/
+fly-data/
+assets/_shots/
+assets/_debug*.png
+assets/raw/
+crash.log
+.freebuff/

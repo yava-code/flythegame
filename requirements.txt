@@ -1,0 +1,6 @@
+pygame>=2.5
+numpy>=2.0
+scipy>=1.13
+numba>=0.61
+pillow>=10
+flybrain>=0.1.0
